@@ -4,14 +4,22 @@ var min_speed = 100.0
 var max_speed = 600.0
 var speed_multiplier = 1.0
 var accelerate = false
+var decay = 0.04
 
 var released = true
 
 var initial_velocity = Vector2.ZERO
 
 func _ready():
-	contact_monitor = true
-	contacts_reported = 8
+	if Global.level < 0 or Global.level >= len(Levels.levels):
+		pass
+	else:
+		var level_ball_size = Levels.levels[Global.level].ball_size
+		$CollisionShape2D.scale = $CollisionShape2D.scale*level_ball_size
+		$Highlight.scale = Vector2(0.086,0.086)*1.1*level_ball_size
+		$Sprite.scale = Vector2(0.12,0.12)*1.1*level_ball_size
+		contact_monitor = true
+		contacts_reported = 8
 	if Global.level < 0 or Global.level >= len(Levels.levels):
 		Global.end_game(true)
 	else:
@@ -24,6 +32,7 @@ func _on_Ball_body_entered(body):
 	if body.has_method("hit"):
 		body.hit(self)
 		accelerate = true	
+		$Highlight.modulate.a = 1.0
 
 func _input(event):
 	if not released and event.is_action_pressed("release"):
@@ -35,7 +44,8 @@ func _integrate_forces(state):
 		var paddle = get_node_or_null("/root/Game/Paddle_Container/Paddle")
 		if paddle != null:
 			state.transform.origin = Vector2(paddle.position.x + paddle.width, paddle.position.y - 30)	
-
+	if $Highlight.modulate.a > 0:
+		$Highlight.modulate.a -= decay
 	if position.y > Global.VP.y + 100:
 		die()
 	if accelerate:
@@ -48,9 +58,9 @@ func _integrate_forces(state):
 	if state.linear_velocity.length() > max_speed * speed_multiplier:
 		state.linear_velocity = state.linear_velocity.normalized() * max_speed * speed_multiplier
 
-func change_size(s):
-	$ColorRect.rect_scale = s
-	$CollisionShape2D.scale = s
+#func change_size(s):
+#	$Sprite.rect_scale = s
+#	$CollisionShape2D.scale = s
 
 func change_speed(s):
 	speed_multiplier = s

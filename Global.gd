@@ -17,6 +17,7 @@ export var default_starting_in = 4
 export var default_lives = 5
 
 func _ready():
+	OS.set_window_position(Vector2(10,10))
 	pause_mode = Node.PAUSE_MODE_PROCESS
 	randomize()
 	VP = get_viewport().size

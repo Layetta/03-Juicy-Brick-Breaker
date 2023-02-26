@@ -7,20 +7,31 @@ var dying = false
 var powerup_prob = 0.1
 
 func _ready():
+	#$ColorRect.set_size(Vector2(90,30))
+	$CollisionShape2D.shape.extents = Vector2(90,30)
 	randomize()
 	position = new_position
-
+#	if(score>=100):
+#		$ColorRect.color = Color8(255,0,0)
+#	elif(score>=50):
+#		$ColorRect.color = Color8(255,255,0)
+#	elif(score>=0):
+#		$ColorRect.color = Color8(255,0,255)
+		
 func _physics_process(_delta):
 	if dying:
 		queue_free()
 
 func hit(_ball):
+	var brick_sound = get_node_or_null("/root/Game/Brick_Sound")
+	if brick_sound != null:
+		brick_sound.play()
 	die()
 
 func die():
 	dying = true
 	collision_layer = 0
-	$ColorRect.hide()
+	#$ColorRect.hide()
 	Global.update_score(score)
 	if not Global.feverish:
 		Global.update_fever(score)
